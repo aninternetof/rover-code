@@ -4,7 +4,7 @@ MAINTAINER Clifton Barnes <clifton.a.barnes@gmail.com>
 
 RUN apt-get update
 RUN apt-get install -y python python-dev python-pip python-smbus nginx build-essential git libssl-dev
-RUN pip install flask flask-socketio gevent uwsgi Sphinx==1.4.8 sphinx_rtd_theme pytest-flask pytest-cov mock requests responses pylint==1.6.5 prospector==0.12.4 flask-cors
+RUN pip install flask flask-socketio gevent uwsgi Sphinx==1.4.8 sphinx_rtd_theme pytest-flask pytest-cov mock requests responses pylint==1.6.5 prospector==0.12.4 flask-cors python-dotenv
 
 EXPOSE 80
 

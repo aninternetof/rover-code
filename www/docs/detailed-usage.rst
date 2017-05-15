@@ -1,6 +1,21 @@
 detailed usage
 ===============
 
+using rovercode with a rovercode-web hosted somewhere other than rovercode.com
+-------------------------------------------------------------------------------
+By default, when rovercode runs, it registers itself with
+`https://rovercode.com`. But what if you want to try your changes to rovercode
+with `https://beta.rovercode.com`? Or with your local instance of rovercode-web
+(as described in the next section)? You can specify the target rovercode-web
+url by creating a .env file in your rovercode directory.
+
+.. code-block:: bash
+
+    # first, navigate to the rovercode root diretory (same level as the Dockerfile), then
+    $ echo ROVERCODE_WEB_URL=https://beta.rovercode.com/ >> .env
+
+When you start rovercode, it will register itselft with `beta.rovercode.com`.
+
 develop rovercode and rovercode-web on the same machine at the same time
 --------------------------------------------------------------------------
 
@@ -21,18 +36,14 @@ Get and build rovercode as usual:
     $ git clone --recursive https://github.com/aninternetof/rovercode.git && cd rovercode
     $ sudo docker build -t rovercode .
 
-Open `app.py` and comment/uncomment the `ROVERCODE_WEB_REG_URL` lines to select
-`rovercodeweb:8000`. You want it to end up like this:
+Set the url of the rovercode-web target to `http://rovercodeweb:8000`. You will
+see in the next step that this is the hostname that we assign to our local
+rovercode-web container.
 
-.. code-block:: python
+.. code-block:: bash
 
-    ''' Default. Use with rovercode-web running at rovercode.com '''
-    #ROVERCODE_WEB_REG_URL = "https://rovercode.com/mission-control/rovers/"
-    ''' Uncomment this line to use with rovercode-web running at beta.rovercode.com '''
-    #ROVERCODE_WEB_REG_URL = "https://beta.rovercode.com/mission-control/rovers/"
-    ''' Uncomment this line to use with a local rovercodeweb docker container '''
-    ROVERCODE_WEB_REG_URL = "http://rovercodeweb:8000/mission-control/rovers/"
-
+    # first, navigate to the rovercode root diretory (same level as the Dockerfile), then
+    $ echo ROVERCODE_WEB_URL=http://rovercodeweb:8000/ >> .env
 
 Finally, when you bring up the rovercode container, add a `link` flag to allow access
 between this container and your rovercode-web container.

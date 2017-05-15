@@ -6,18 +6,21 @@ from os import listdir
 from os.path import isfile, join
 import xml.etree.ElementTree
 from flask_socketio import SocketIO, emit
+from dotenv import load_dotenv, find_dotenv
+import os
 try:
     import Adafruit_GPIO.PWM as pwmLib
     import Adafruit_GPIO.GPIO as gpioLib
 except ImportError:
     print "Adafruit_GPIO lib unavailable"
 
-''' Default. Use with rovercode-web running at rovercode.com '''
-ROVERCODE_WEB_REG_URL = "https://rovercode.com/mission-control/rovers/"
-''' Uncomment this line to use with rovercode-web running at beta.rovercode.com '''
-#ROVERCODE_WEB_REG_URL = "https://beta.rovercode.com/mission-control/rovers/"
-''' Uncomment this line to use with a local rovercodeweb docker container '''
-#ROVERCODE_WEB_REG_URL = "http://rovercodeweb:8000/mission-control/rovers/"
+
+load_dotenv(find_dotenv())
+rovercode_web_url = os.getenv("ROVERCODE_WEB_URL", "https://rovercode.com/")
+if rovercode_web_url[-1:] != '/':
+    rovercode_web_url += '/'
+
+ROVERCODE_WEB_REG_URL = rovercode_web_url + "mission-control/rovers/"
 
 # Let SocketIO choose the best async mode
 async_mode = 'gevent_uwsgi'
