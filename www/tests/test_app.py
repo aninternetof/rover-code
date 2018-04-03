@@ -74,7 +74,7 @@ def test_register_with_web_update(testapp):
                   json=response_payload, status=200,
                   content_type='application/json'
     )
-    url_re = re.compile(testapp.ROVERCODE_WEB_REG_URL + r'\?client_id=xxxx')
+    url_re = re.compile(testapp.ROVERCODE_WEB_REG_URL + r'\?oauth_application__client_id=xxxx')
     response_list = [response_payload]
     responses.add(responses.GET,
                   url_re,
@@ -96,6 +96,6 @@ def test_register_with_web_update(testapp):
     assert testapp.binary_sensors[1].pin == 'Pin-B'
     assert len(responses.calls) == 3
     assert responses.calls[0].request.url == testapp.ROVERCODE_WEB_OAUTH2_URL + '/'
-    assert responses.calls[1].request.url == testapp.ROVERCODE_WEB_REG_URL + '?client_id=xxxx'
+    assert responses.calls[1].request.url == testapp.ROVERCODE_WEB_REG_URL + '?oauth_application__client_id=xxxx'
     # test that the update happened
     assert responses.calls[2].request.url == testapp.ROVERCODE_WEB_REG_URL + '/' + str(web_id)+'/'

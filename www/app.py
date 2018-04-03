@@ -98,7 +98,7 @@ class HeartBeatManager():
 
     def read(self):
         """Look for our name on rovercode-web. Sets web_id if found."""
-        result = requests.get(ROVERCODE_WEB_REG_URL+'?client_id='+self.client_id, headers=self.auth_header)
+        result = requests.get(ROVERCODE_WEB_REG_URL+'?oauth_application__client_id='+self.client_id, headers=self.auth_header)
         try:
             info = json.loads(result.text)[0]
             self.web_id = info['id']
