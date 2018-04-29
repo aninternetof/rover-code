@@ -1,0 +1,16 @@
+[Unit]
+Description=RoverCode Daemon Service
+After=syslog.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/rovercode/
+ExecStart=/opt/rovercode/start.sh
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+Alias=rovercode.service
