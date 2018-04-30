@@ -7,6 +7,7 @@ setuptools*
 .idea
 .env
 .cache/
+.pytest_cache/
 env/
 htmlcov/
 www/docs/generated/

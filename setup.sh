@@ -15,7 +15,7 @@ fi
 
 apt-get install -y python python-dev python-pip python-smbus
 pip install virtualenv && \
-virtualenv env && \
+virtualenv --system-site-packages env && \
 . env/bin/activate && \
 pip install -r www/requirements.txt
 

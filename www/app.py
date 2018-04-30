@@ -11,6 +11,8 @@ try:
 except ImportError:
     print "Adafruit_GPIO lib unavailable"
 
+from drivers.VCNL4010 import VCNL4010
+
 """Globals"""
 ROVERCODE_WEB_REG_URL = ''
 ROVERCODE_WEB_OAUTH2_URL = ''
@@ -36,18 +38,18 @@ class BinarySensor:
 
     :param name:
         The human readable name of the sensor
-    :param pin:
-        The hardware pin connected to the sensor
+    :param sensor:
+        The object representing the hardware sensor
     :param rising_event:
         The event name associated with a signal changing from low to high
     :param falling_event:
         The event name associated with a signal changing from high to low
     """
 
-    def __init__(self, name, pin, rising_event, falling_event):
+    def __init__(self, name, sensor, rising_event, falling_event):
         """Constructor for BinarySensor object."""
         self.name = name
-        self.pin = pin
+        self.sensor = sensor 
         self.rising_event = rising_event
         self.falling_event = falling_event
         self.old_val = False
@@ -103,8 +105,14 @@ class HeartBeatManager():
             info = json.loads(result.text)[0]
             self.web_id = info['id']
             self.name = info['name']
-            init_input_gpio(info['left_eye_pin'], info['right_eye_pin'])
-        except (KeyError, IndexError):
+            init_inputs(
+                info['left_eye_i2c_port'],
+                info['left_eye_i2c_addr'],
+                info['right_eye_i2c_port'],
+                info['right_eye_i2c_addr']
+            )
+        except (KeyError, IndexError) as e:
+            print "Missing something important from rover payload: " + str(e)
             self.web_id = None
 
     def stopThread(self):
@@ -135,22 +143,22 @@ def sensors_thread():
     """Scan each binary sensor and sends events based on changes."""
     while True:
         global binary_sensors
-        socketio.sleep(0.2)
+        socketio.sleep(0.3)
         for s in binary_sensors:
-            new_val = gpio.is_high(s.pin)
+            new_val = s.sensor.is_high()
             if (s.old_val == False) and (new_val == True):
                 print s.rising_event
                 socketio.emit('binary_sensors', {'data': s.rising_event},
-                    namespace='/api/v1')
+                    namespace='/api/v1/')
             elif (s.old_val == True) and (new_val == False):
                 print s.falling_event
                 socketio.emit('binary_sensors', {'data': s.falling_event},
-                    namespace='/api/v1')
+                    namespace='/api/v1/')
             else:
                 pass
             s.old_val = new_val
 
-@socketio.on('connect', namespace='/api/v1')
+@socketio.on('connect', namespace='/api/v1/')
 def connect():
     """Connect to the rovercode-web websocket."""
     global ws_thread
@@ -159,7 +167,7 @@ def connect():
         ws_thread = socketio.start_background_task(target=sensors_thread)
     emit('status', {'data': 'Connected'})
 
-@socketio.on('status', namespace='/api/v1')
+@socketio.on('status', namespace='/api/v1/')
 def test_message(message):
     """Send a debug test message when status is received from rovercode-web."""
     print "Got a status message: " + message['data']
@@ -183,18 +191,30 @@ def send_command():
     run_command(request.form)
     return jsonify(request.form)
 
-def init_input_gpio(left_eye_pin, right_eye_pin):
+def init_inputs(left_eye_port, left_eye_addr, right_eye_port, right_eye_addr):
     """Initialize input GPIO."""
-    global gpio
-    try:
-        # set up IR sensor gpio
-        gpio.setup(right_eye_pin, gpioLib.IN)
-        gpio.setup(left_eye_pin, gpioLib.IN)
-    except NameError:
-        print "Adafruit_GPIO lib is unavailable"
     global binary_sensors
-    binary_sensors.append(BinarySensor("left_ir_sensor", left_eye_pin, 'leftEyeUncovered', 'leftEyeCovered'))
-    binary_sensors.append(BinarySensor("right_ir_sensor", right_eye_pin, 'rightEyeUncovered', 'rightEyeCovered'))
+
+    def get_env_int(name):
+        try:
+            return int(os.getenv(name, None))
+        except Exception:
+            return None
+
+    left_eye_led_current = get_env_int('LEFT_EYE_LED_CURRENT')
+    left_eye_threshold = get_env_int('LEFT_EYE_THRESHOLD')
+    right_eye_led_current = get_env_int('RIGHT_EYE_LED_CURRENT')
+    right_eye_threshold = get_env_int('RIGHT_EYE_THRESHOLD')
+    binary_sensors.append(BinarySensor(
+        "left_ir_sensor",
+        VCNL4010(left_eye_port, left_eye_addr, left_eye_led_current, left_eye_threshold),
+        'leftEyeUncovered',
+        'leftEyeCovered'))
+    binary_sensors.append(BinarySensor(
+        "right_ir_sensor",
+        VCNL4010(right_eye_port, right_eye_addr, right_eye_led_current, right_eye_threshold),
+        'rightEyeUncovered',
+        'rightEyeCovered'))
 
     # test adapter
     if pwm.__class__.__name__ == 'DUMMY_PWM_Adapter':

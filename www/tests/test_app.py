@@ -6,10 +6,10 @@ TEST_URL = "http://a.com/"
 
 def test_sensor_init(testapp):
     """Test the initialization of the sensors."""
-    testapp.init_input_gpio('Pin-A', 'Pin-B')
+    testapp.init_inputs(0, 1, 2, 3)
     assert len(testapp.binary_sensors) == 2
-    assert testapp.binary_sensors[0].pin == 'Pin-A'
-    assert testapp.binary_sensors[1].pin == 'Pin-B'
+    assert testapp.binary_sensors[0].sensor.i2c_addr == 1
+    assert testapp.binary_sensors[1].sensor.i2c_addr == 3
 
 def test_get_local_ip(testapp):
     """Test that the rover can get its local ip address."""
@@ -59,8 +59,10 @@ def test_register_with_web_update(testapp):
     web_id = '444'
     payload = {'name': testapp.rover_name,
                'web_id': web_id,
-               'left_eye_pin': 'Pin-A',
-               'right_eye_pin': 'Pin-B',
+               'left_eye_i2c_port': 5,
+               'left_eye_i2c_addr': 6,
+               'right_eye_i2c_port': 7,
+               'right_eye_i2c_addr': 8,
                'local_ip': '2.2.2.2'}
     access_token = '1234'
     response_payload = payload.copy()
@@ -92,8 +94,8 @@ def test_register_with_web_update(testapp):
     # test the side-effects of read()
     assert heartbeat_manager.web_id == web_id
     assert len(testapp.binary_sensors) == 2
-    assert testapp.binary_sensors[0].pin == 'Pin-A'
-    assert testapp.binary_sensors[1].pin == 'Pin-B'
+    assert testapp.binary_sensors[0].sensor.i2c_addr == 6
+    assert testapp.binary_sensors[1].sensor.i2c_addr == 8
     assert len(responses.calls) == 3
     assert responses.calls[0].request.url == testapp.ROVERCODE_WEB_OAUTH2_URL + '/'
     assert responses.calls[1].request.url == testapp.ROVERCODE_WEB_REG_URL + '?client_id=xxxx'
