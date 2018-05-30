@@ -65,6 +65,7 @@ class VCNL4010:
         except IOError:
             print 'Failed to read VCNL4010 at address {} register 0x85'\
                 .format(self.i2c_addr)
+            raise
 
         # Convert the data
         luminance = data[0] * 256 + data[1]  # lux

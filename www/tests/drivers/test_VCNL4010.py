@@ -1,5 +1,6 @@
 """Test the VCNL4010 sensor helper."""
 from mock import patch, call, MagicMock
+import pytest
 
 from drivers.VCNL4010 import VCNL4010
 
@@ -31,8 +32,18 @@ def test_get_is_high():
         # value equal to threshold doesn't really concern us
 
 
+def test_get_is_high_error():
+    """Test the binary interpretation of the proximity value with an error."""
+    mockbus = MagicMock()
+    with patch('smbus.SMBus', return_value=mockbus):
+        driver = VCNL4010(1, 2, 3, 258)
+        mockbus.read_i2c_block_data.side_effect = IOError()
+        with pytest.raises(IOError):
+            driver.is_high()
+
+
 def test_get_values():
-    """Test the binary interpretation of the proximity value."""
+    """Test getting the values from the sensor."""
     mockbus = MagicMock()
     with patch('smbus.SMBus', return_value=mockbus):
         driver = VCNL4010(1, 2, 3, 258)

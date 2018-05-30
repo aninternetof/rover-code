@@ -1,27 +1,60 @@
 sudo: true
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev xvfb
-  - sudo apt-get install -qq libtiff4-dev libjpeg8-dev libfreetype6-dev liblcms1-dev libwebp-dev
-  - sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv python-pip python-smbus
-  - sudo apt-get install -qq firefox automake libtool libreadline6 libreadline6-dev libreadline-dev
-  - sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev wget curl llvm
-  - cd www/Adafruit_Python_GPIO/
-  - python setup.py install
-  - cd ../../
+- sudo apt-get update -qq
+- sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev
+  xvfb
+- sudo apt-get install -qq libtiff4-dev libjpeg8-dev libfreetype6-dev liblcms1-dev
+  libwebp-dev
+- sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv
+  python-pip python-smbus
+- sudo apt-get install -qq firefox automake libtool libreadline6 libreadline6-dev
+  libreadline-dev
+- sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev
+  wget curl llvm
+- cd www/Adafruit_Python_GPIO/
+- python setup.py install
+- cd ../../
 install:
-  - pip install -r www/requirements.txt
-  - pip install coveralls
+- pip install -r www/requirements.txt
+- pip install coveralls
 script:
-  - py.test
-  - prospector
+- pushd www/docs
+- make html
+- popd
 after_success:
-  - coveralls
+- coveralls
 language: python
 virtualenv:
   system_site_packages: true
 python:
-- "2.7"
+- '2.7'
+deploy:
+- provider: s3
+  access_key_id: AKIAIIORSR4VN3YQY2YQ
+  secret_access_key:
+    secure: Lq6DttSkL5KvXxibAbiAPeyGEH+8K7VWZNQRJD8XJIqBkd+yhlO1rldehN8IVKpM6iCaWRrwSPh/XAgKP6SZE89AgIDtNmlvIa+pMvGucp3VmkK90e6XA/bkiUGyax8hFniXBAYHKFScPIe+T1SJ8c67ABqjOXeq98pK3ejD5aEvXPpLrWdT88wMleqGZ/EIJmgFoAHInCmKzi+Zoc3sf4Q/tFrKHtAYwn1bgCkuIz9VluFDhF2VT5z5yUoOBXae6IVj+jNcOxZRXb8a0vZwcMpz0TndznkdnTgFiObU5hxtGtpTppPikNxgM3CY7tj/AyFdk/C3oS4Q6tmxzBJKbDqKlqukeFnsbU0PyfwOCW+YFPKCyrRuJUooHVqp8qS71bxBqOFX/picnulzMhwGoJAUFJiWlKpTSuruGFDxNZw0gA01IDYcbsws+FCvsOij3veC9RdU34q3qXEEeXTlWpDGj76X1fteA9YSkhoHnDwbNQ+bJqabi8NBD6Dilzgtbci3BN1orZ/pqSxbTlUMMJpoj2i12W1fVWUF344dIVbZdxhe4e8HezsWIiUcBR+fgfT/ecwt4CvcC6VDA0QDWt5ZoRHIT5CDMcc0zKfWhyQpAFAoTAIkm/BYfzGG+LV15miRxH36GL04f/FdaCSRgJMNEovuSY8UN6WDW3Jr0MI=
+  bucket: rovercode-contrib-docs
+  local_dir: www/docs/_build/html
+  upload-dir: rovercode/development
+  acl: public_read
+  skip_cleanup: true
+  region: us-east-2
+  on:
+    repo: rovercode/rovercode
+    branch: development
+- provider: s3
+  access_key_id: AKIAIIORSR4VN3YQY2YQ
+  secret_access_key:
+    secure: Lq6DttSkL5KvXxibAbiAPeyGEH+8K7VWZNQRJD8XJIqBkd+yhlO1rldehN8IVKpM6iCaWRrwSPh/XAgKP6SZE89AgIDtNmlvIa+pMvGucp3VmkK90e6XA/bkiUGyax8hFniXBAYHKFScPIe+T1SJ8c67ABqjOXeq98pK3ejD5aEvXPpLrWdT88wMleqGZ/EIJmgFoAHInCmKzi+Zoc3sf4Q/tFrKHtAYwn1bgCkuIz9VluFDhF2VT5z5yUoOBXae6IVj+jNcOxZRXb8a0vZwcMpz0TndznkdnTgFiObU5hxtGtpTppPikNxgM3CY7tj/AyFdk/C3oS4Q6tmxzBJKbDqKlqukeFnsbU0PyfwOCW+YFPKCyrRuJUooHVqp8qS71bxBqOFX/picnulzMhwGoJAUFJiWlKpTSuruGFDxNZw0gA01IDYcbsws+FCvsOij3veC9RdU34q3qXEEeXTlWpDGj76X1fteA9YSkhoHnDwbNQ+bJqabi8NBD6Dilzgtbci3BN1orZ/pqSxbTlUMMJpoj2i12W1fVWUF344dIVbZdxhe4e8HezsWIiUcBR+fgfT/ecwt4CvcC6VDA0QDWt5ZoRHIT5CDMcc0zKfWhyQpAFAoTAIkm/BYfzGG+LV15miRxH36GL04f/FdaCSRgJMNEovuSY8UN6WDW3Jr0MI=
+  bucket: rovercode-contrib-docs
+  local_dir: www/docs/_build/html
+  upload-dir: rovercode/master
+  acl: public_read
+  skip_cleanup: true
+  region: us-east-2
+  on:
+    repo: rovercode/rovercode
+    branch: master
 notifications:
   slack:
     secure: tDLg3aPAQjoXrHQzXNUTGt758NrQKqvuHXzDVBHmOKuLWGoHh4D9BvEvjTRY3YVHPa+mz1nT4UYLDBDEcZl9mV3SjVoopLMQGpysJZhDrvBLir//eZkTmQ8/pKOVu2mmeiaw0xvRimvIW/r9boKvEGiS6QNqKitO2VFQVJX9RfFBEJg1u4vuhj6k4MIWy94Hl/6lj6yNeWEL5wUcS18R4x8nUCl8O3vaBt7RZwOkEsNj/FMja3nexdWShjOhxQuGc9TdHCpfpv8NlpNKCBlVnu7l1DKl/UzI9Qi1w4dWjWLaMDndxfpuQ2vY4ybs/UupV2Wo6Ng+m92bsJ37zPF5HGn6pi8rX02iH8J+rPRKlJq0R/McRfZ06r3k1XSFDHQrU/Fi5lIAQ7dza6i7k5JEE3AlTBJ80/MHpk9q/8uz8sTipY7V+TvNdyeuR+p5iUbwYsLIoHJotcpe8rzVOZUTW14pYodyl8PBfdgg8LmNgNwMyyWhqiC7ocxD4ltXWV7Pqq7pArHq3cts65fbFqAGfDPvt/rnV1bVnlM3aiQZE3ofVvVNB6DF7ykjqYFv6sZy1/FtKIK6pddD5I+JuFNQzMakzhJw+FI5ZeYfIra69Wu1Fo0E7t7ONXdejYooGkVZE5Gl6qyhp39S5zXAtC6pu6EklXumoSB1KXXo7MDQWgM=

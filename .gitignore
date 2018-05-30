@@ -5,6 +5,7 @@ dist/
 setuptools*
 
 .idea
+.vscode/
 .env
 .cache/
 .pytest_cache/
