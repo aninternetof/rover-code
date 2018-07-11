@@ -1,5 +1,5 @@
 [Unit]
-Description=RoverCode Daemon Service
+Description=rovercode Daemon Service
 After=syslog.target
 
 [Service]
