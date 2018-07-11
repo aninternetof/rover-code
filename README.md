@@ -2,26 +2,23 @@
 
 # rovercode
 
-[![Slack](https://img.shields.io/badge/chat-on%20Slack-41AB8C.svg?style=flat)](http://chat.rovercode.com/)
-[![Mailinglist](https://img.shields.io/badge/join-mailing%20list-yellow.svg?style=flat)](https://1988.onlinegroups.net/groups/rovercode-developers/)
-[![](https://images.microbadger.com/badges/image/cabarnes/rovercode.svg)](https://microbadger.com/images/cabarnes/rovercode)
+[![Gitter](https://badges.gitter.im/rovercode.png)](https://gitter.im/rovercode/Lobby)
 [![Build Status](https://travis-ci.org/rovercode/rovercode.svg?branch=development)](https://travis-ci.org/rovercode/rovercode)
 [![Coverage Status](https://coveralls.io/repos/github/rovercode/rovercode/badge.svg)](https://coveralls.io/github/rovercode/rovercode)
 
-rovercode is easy-to-use package for controlling robots (rovers) that can sense and react to their environment. The Blockly editor makes it easy to program and run your bot straight from your browser. Just drag and drop your commands to drive motors, read values from a variety of supported sensors, and see what your rover sees with the built in webcam viewer.
+rovercode is an open-source educational robotics platform. Students use our web-based drag-and-drop editor to create
+code that listens to the rover's sensors and controls its motors.
 
-rovercode runs on any single-board-computer supported by the [Adafruit Python GPIO wrapper library](https://github.com/adafruit/Adafruit_Python_GPIO), including the NextThingCo CHIP, Raspberry Pi, and BeagleBone Black. Once installed, head to to rovercode.com and connect to your rover.
+rovercode is made up of serveral code repositories. You are currently viewing `rovercode`, the service that runs
+on the rover itself. It listens for commands from the web application to control the rover's motors, and it monitors the rover's sensors and sends their values up to the web application. The service can run on most single-board-computers and is 
+officially tested with the Raspberry Pi 3, Raspberry Pi Zero W, and the Next Thing Co. CHIP.
 
-**rovercode is made up of two parts.** rovercode (this repo) is the service that runs on the rover. rovercode-web ([a different repo](https://github.com/rovercode/rovercode-web)) is the web app that is hosted on the Internet.
-[Try a live demo.](https://rovercode.com/mission-control)
-
-## Contributing
-Check out our [contributing page](http://rovercode.readthedocs.io/en/latest/contribute.html) to get started.
+To learn about the other pieces of rovercode, visit our [architecture documentation](https://contributor-docs.rovercode.com/architecture.html), or start at [the root of rovercode's documentation](https://contributor-docs.rovercode.com).
 
 ## Setup
 
-### Standard Setup
-First, on your rover (CHIP, Raspberry Pi, BeagleBone, etc):
+### Setup on the rover
+First, on your rover (Raspberry Pi, CHIP, etc):
 ```bash
 $ sudo apt install git
 $ git clone --recursive https://github.com/rovercode/rovercode.git && cd rovercode
@@ -32,48 +29,40 @@ $ sudo bash start.sh #run this each time you boot the rover (or automatically st
 Then, on any PC or tablet, head to rovercode.com to connect to your rover. Start playing!
 
 ### Development PC Setup
-When developing rovercode, you may want to run rovercode on your PC instead of a CHIP/Raspberry Pi/Beaglebone. Below are instructions for how to install and run rovercode on your PC. Everything should work fine: rovercode will automatically detect that it is not running on target hardware and will stub out the calls to the motors and sensors.
+When developing rovercode, you may want to run rovercode on your PC instead of a CHIP/Raspberry Pi/Beaglebone.
+Below are instructions for how to install and run rovercode on your PC. Don't worry about hardware-specific things
+like I2C: rovercode will automatically detect that it is not running on target hardware and will stub out the calls to the motors 
+and sensors.
 
-#### Development PC Standard Setup
 First, on your development PC:
-```bash
-$ sudo apt install git
-$ git clone --recursive https://github.com/rovercode/rovercode.git && cd rovercode
-$ sudo bash setup.sh #run this only once -- it will take some time
-$ # create your .env, as described in the section below
-$ sudo bash start.sh #run this each time
-```
-Then, still on your development PC, head to rovercode.com and connect to your "rover" (your PC running the service).
-
-#### Development PC Alternate Setup (Docker)
-Rather use Docker? First, on your development PC:
 ```bash
 $ sudo apt install git docker.io
 $ git clone --recursive https://github.com/rovercode/rovercode.git && cd rovercode
 $ sudo docker build -t rovercode .
 $ # create your .env, as described in the section below
 $ sudo docker run --name rovercode -v $PWD:/var/www/rovercode -p 80:80 -d rovercode
-
 ```
-Then, still on your development PC, head to rovercode.com and connect to your "rover" (your PC running the service).
 
 ### Creating Your .env
-First, create a rovercode.com account [here](https://rovercode.com/accounts/signup/). Then, navigate to the "My Rovers" section and create a new rover. Once it is created, click the "Download Credentials" button at the bottom of the rover's detail page. Save the credentials file as `.env` in the same directory as this README.
+First, create a rovercode.com account [here](https://rovercode.com/accounts/signup/). Then, navigate to the "My Rovers" section and
+create a new rover. Once it is created, click the "Download Credentials" button at the bottom of the rover's detail page. The file
+will download as something like `rovercode_yourrovername.env`. Rename the file as only `.env` (nothing before the dot) and save it in the same directory as this README.
 
-## Play and Contribute
-rovercode is usable now, but we have lots of great features left to be added. Check out the [contributing instructions](http://rovercode.readthedocs.io/en/development/contribute.html) then head over to the feature tracker to see if there's something fun to contribute.
+### Something Not Working?
+If something in these instructions is not working right for you, you can get help in [our Gitter chatroom](https://gitter.im/rovercode/Lobby). Or, if you think it might be a bug, you can [file a ticket](https://github.com/rovercode/rovercode/issues/new).
 
-## Testing
-Run the tests like this:
-```bash
-$ pwd
-> ~/rovercode
-$ py.test
-```
-Or, if you're using Docker, make sure the container is running (the `sudo docker run ...` command above), then do:
-```bash
-$ sudo docker exec -it rovercode bash -c "cd ../; py.test"
-```
+
+## Docs
+More detailed usage instructions can be found [here](https://contributor-docs.rovercode.com/rovercode/master/setup.html).
+
+Read the complete docs [here](https://contributor-docs.rovercode.com).
+
+## Contributing
+Help make rovercode better! Check out the [contributing guide](https://contributor-docs.rovercode.com/contributing.html). 
+
+We'd love to chat with you! Say hello in [our Gitter room](https://gitter.im/rovercode/Lobby).
+
+You can also email developers@rovercode.com.
 
 ## Docs
 Read the complete docs [here](http://rovercode.readthedocs.io/en/latest).

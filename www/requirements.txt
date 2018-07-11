@@ -3,7 +3,7 @@ flask-socketio
 eventlet
 docutils<0.13.1
 Sphinx==1.4.8
-sphinx_rtd_theme
+sphinx_rtd_theme==0.4.0
 pytest-flask
 pytest-cov
 mock
